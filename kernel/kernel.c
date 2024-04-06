@@ -5,6 +5,7 @@
 #include <readline/history.h>
 
 #include "system.h"
+#include "fork.h"
 void print_minios(char* str);
 
 int main() {
@@ -20,14 +21,19 @@ int main() {
             break;
         }
 
-        if (strcmp(input,"minisystem") == 0){
-            minisystem();
-        }
+    else if (strcmp(input,"minisystem") == 0){
+        minisystem();
+    }
 
-	if (strcmp(input,"add") == 0){
-	    printf("%d\n", add());
+	else if (strcmp(input,"add") == 0){
+        printf("%d\n", add());
 	}
-        else system(input);
+
+    else if (strcmp(input,"fork") == 0){
+	    fork_hello();
+	}
+    
+    else system(input);
     }
 
     // 메모리 해제
