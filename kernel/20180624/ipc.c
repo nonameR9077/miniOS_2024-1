@@ -32,7 +32,7 @@ int ipc()
         close(fd[READ_END]);    // close the unused end of the pipe
         /*write to the pipe*/
         write(fd[WRITE_END], write_msg, strlen(write_msg) + 1);
-        printf("write msg : %s\n", write_msg);
+        printf("write msg : %s\n", writeS_msg);
         /*close the write end of the pipe*/
         close(fd[WRITE_END]);
 
