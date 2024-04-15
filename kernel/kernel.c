@@ -6,6 +6,7 @@
 
 #include "system.h"
 #include "fork.h"
+#include "ipc.h"
 void print_minios(char* str);
 
 int main() {
@@ -32,9 +33,13 @@ int main() {
     else if (strcmp(input,"fork") == 0){
 	    fork_hello();
 	}
-    
+
+    else if (strcmp(input,"ipc") == 0){
+	    ipc();
+	} 
     else system(input);
-    }
+
+}
 
     // 메모리 해제
     free(input);
