@@ -36,7 +36,11 @@ int main() {
 
     else if (strcmp(input,"ipc") == 0){
 	    ipc();
-	} 
+	}
+
+    else if (strcmp(input,"pi") == 0){
+        printf("pi value is: %f\n",montecarlo_pi());
+    } 
     else system(input);
 
 }
