@@ -7,3 +7,5 @@ void minisystem();
 int add();
 
 double montecarlo_pi();
+
+void roundRobinScheduler();
