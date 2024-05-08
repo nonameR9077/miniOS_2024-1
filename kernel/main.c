@@ -1,17 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <readline/readline.h>
-#include <readline/history.h>
 #include <gtk/gtk.h>
-
-#include "system.h"
-#include "fork.h"
-#include "ipc.h"
-
-// just checking
-void print_minios(char* str);
-
 
 // Function prototypes
 static void login_button_clicked(GtkWidget *widget, gpointer data);
@@ -22,8 +9,6 @@ GtkWidget *login_window, *welcome_window;
 GtkWidget *id_entry, *pw_entry, *input_entry, *output_text;
 
 int main(int argc, char *argv[]) {
-    print_minios("[MiniOS SSU] Hello, World!");
-
     gtk_init(&argc, &argv);
 
     // Create login window
@@ -39,7 +24,7 @@ int main(int argc, char *argv[]) {
     id_entry = gtk_entry_new();
     GtkWidget *pw_label = gtk_label_new("PW: ");
     pw_entry = gtk_entry_new();
-    // invisable?
+    pw_entry->visibility = FALSE;
 
     GtkWidget *login_button = gtk_button_new_with_label("Login");
     g_signal_connect(login_button, "clicked", G_CALLBACK(login_button_clicked), NULL);
@@ -52,7 +37,7 @@ int main(int argc, char *argv[]) {
 
     // Create welcome window
     welcome_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-    gtk_window_set_title(GTK_WINDOW(welcome_window), "miniOS");
+    gtk_window_set_title(GTK_WINDOW(welcome_window), "Welcome");
     gtk_window_set_default_size(GTK_WINDOW(welcome_window), 400, 300);
     gtk_window_set_position(GTK_WINDOW(welcome_window), GTK_WIN_POS_CENTER);
 
@@ -78,61 +63,21 @@ static void login_button_clicked(GtkWidget *widget, gpointer data) {
     const gchar *id = gtk_entry_get_text(GTK_ENTRY(id_entry));
     const gchar *pw = gtk_entry_get_text(GTK_ENTRY(pw_entry));
 
-    // maybe use hash?
-    // just use strcmp for now
-    if (g_strcmp0(id, "ssu") == 0 && g_strcmp0(pw, "1234") == 0) {
+    // Replace this with your actual login logic
+    if (g_strcmp0(id, "username") == 0 && g_strcmp0(pw, "password") == 0) {
         gtk_widget_hide(login_window);
         gtk_widget_show_all(welcome_window);
     } else {
-        g_print("Invalid username or password! Please try again.\n");
+        g_print("Invalid username or password\n");
     }
 }
 
 static void process_input(GtkWidget *widget, gpointer data) {
     const gchar *input_text = gtk_entry_get_text(GTK_ENTRY(input_entry));
 
-    gchar *result_text = gtk_entry_get_text(GTK_ENTRY(input_entry));
-
-    // cmd
-   	if (g_strcmp0(input_text,"exit") == 0) {
-            print_minios("[MiniOS SSU] MiniOS Shutdown........");
-            exit(0);
-        }
-    else {
-    }
-
-//     else if (strcmp(input,"minisystem") == 0){
-//         minisystem();
-//     }
-
-// 	else if (strcmp(input,"add") == 0){
-//         printf("%d\n", add());
-// 	}
-
-//     else if (strcmp(input,"fork") == 0){
-// 	    fork_hello();
-// 	}
-
-//     else if (strcmp(input,"ipc") == 0){
-// 	    ipc();
-// 	}
-
-//     else if (strcmp(input,"pi") == 0){
-//         printf("pi value is: %f\n",montecarlo_pi());
-//   } 
-
-
     GtkTextBuffer *buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(output_text));
     gtk_text_buffer_insert_at_cursor(buffer, input_text, -1);
     gtk_text_buffer_insert_at_cursor(buffer, "\n", -1);
 
-    gtk_text_buffer_insert_at_cursor(buffer, ">> ", -1);
-    gtk_text_buffer_insert_at_cursor(buffer, result_text, -1);
-    gtk_text_buffer_insert_at_cursor(buffer, "\n", -1);
-
     gtk_entry_set_text(GTK_ENTRY(input_entry), "");
-}
-
-void print_minios(char* str) {
-        printf("%s\n",str);
 }
