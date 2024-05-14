@@ -16,6 +16,7 @@ void print_minios(char* str);
 // Function prototypes
 static void login_button_clicked(GtkWidget *widget, gpointer data);
 static void process_input(GtkWidget *widget, gpointer data);
+static gboolean close_window(GtkWidget *widget, GdkEvent *event, gpointer data);
 
 // Global variables
 GtkWidget *login_window, *welcome_window;
@@ -31,6 +32,7 @@ int main(int argc, char *argv[]) {
     gtk_window_set_title(GTK_WINDOW(login_window), "Login");
     gtk_window_set_default_size(GTK_WINDOW(login_window), 300, 150);
     gtk_window_set_position(GTK_WINDOW(login_window), GTK_WIN_POS_CENTER);
+    g_signal_connect(login_window, "delete-event", G_CALLBACK(close_window), NULL);
 
     GtkWidget *vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
     gtk_container_add(GTK_CONTAINER(login_window), vbox);
@@ -39,7 +41,8 @@ int main(int argc, char *argv[]) {
     id_entry = gtk_entry_new();
     GtkWidget *pw_label = gtk_label_new("PW: ");
     pw_entry = gtk_entry_new();
-    // invisable?
+    gtk_entry_set_visibility(pw_entry, FALSE);
+    // invisible?
 
     GtkWidget *login_button = gtk_button_new_with_label("Login");
     g_signal_connect(login_button, "clicked", G_CALLBACK(login_button_clicked), NULL);
@@ -55,6 +58,7 @@ int main(int argc, char *argv[]) {
     gtk_window_set_title(GTK_WINDOW(welcome_window), "miniOS");
     gtk_window_set_default_size(GTK_WINDOW(welcome_window), 400, 300);
     gtk_window_set_position(GTK_WINDOW(welcome_window), GTK_WIN_POS_CENTER);
+    g_signal_connect(welcome_window, "delete-event", G_CALLBACK(close_window), NULL);
 
     GtkWidget *welcome_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
     gtk_container_add(GTK_CONTAINER(welcome_window), welcome_vbox);
@@ -62,11 +66,18 @@ int main(int argc, char *argv[]) {
     input_entry = gtk_entry_new();
     g_signal_connect(input_entry, "activate", G_CALLBACK(process_input), NULL);
 
+    // scroll bar
+    GtkWidget *scrolled_window = gtk_scrolled_window_new(NULL, NULL);
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolled_window), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+
+
     output_text = gtk_text_view_new();
     gtk_text_view_set_editable(GTK_TEXT_VIEW(output_text), FALSE);
+    gtk_container_add(GTK_CONTAINER(scrolled_window), output_text);
 
     gtk_box_pack_start(GTK_BOX(welcome_vbox), input_entry, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(welcome_vbox), output_text, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(welcome_vbox), scrolled_window, TRUE, TRUE, 0);
 
     gtk_widget_show_all(login_window);
     gtk_main();
@@ -92,6 +103,19 @@ static void process_input(GtkWidget *widget, gpointer data) {
     const gchar *input_text = gtk_entry_get_text(GTK_ENTRY(input_entry));
 
     gchar *result_text = gtk_entry_get_text(GTK_ENTRY(input_entry));
+
+    GtkTextBuffer *buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(output_text));
+
+    // Create tag for colored output
+    GtkTextTag *red_tag = gtk_text_buffer_create_tag(buffer, "red_tag", "foreground", "red", NULL);
+
+    GtkTextIter start_iter, end_iter;
+    gtk_text_buffer_get_bounds(buffer, &start_iter, &end_iter);
+    gtk_text_buffer_insert(buffer, &end_iter, input_text, -1);
+    gtk_text_buffer_insert(buffer, &end_iter, "\n", -1);
+    gtk_text_buffer_insert_with_tags_by_name(buffer, &end_iter, ">> ", -1, "red_tag", NULL);
+    gtk_text_buffer_insert_with_tags_by_name(buffer, &end_iter, input_text, -1, "red_tag", NULL);
+    gtk_text_buffer_insert(buffer, &end_iter, "\n", -1);
 
     // cmd
    	if (g_strcmp0(input_text,"exit") == 0) {
@@ -119,20 +143,25 @@ static void process_input(GtkWidget *widget, gpointer data) {
 
 //     else if (strcmp(input,"pi") == 0){
 //         printf("pi value is: %f\n",montecarlo_pi());
-//   } 
+//   }
 
 
-    GtkTextBuffer *buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(output_text));
-    gtk_text_buffer_insert_at_cursor(buffer, input_text, -1);
-    gtk_text_buffer_insert_at_cursor(buffer, "\n", -1);
+    // GtkTextBuffer *buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(output_text));
+    // gtk_text_buffer_insert_at_cursor(buffer, input_text, -1);
+    // gtk_text_buffer_insert_at_cursor(buffer, "\n", -1);
 
-    gtk_text_buffer_insert_at_cursor(buffer, ">> ", -1);
-    gtk_text_buffer_insert_at_cursor(buffer, result_text, -1);
-    gtk_text_buffer_insert_at_cursor(buffer, "\n", -1);
+    // gtk_text_buffer_insert_at_cursor(buffer, ">> ", -1);
+    // gtk_text_buffer_insert_at_cursor(buffer, result_text, -1);
+    // gtk_text_buffer_insert_at_cursor(buffer, "\n", -1);
 
     gtk_entry_set_text(GTK_ENTRY(input_entry), "");
 }
 
 void print_minios(char* str) {
         printf("%s\n",str);
+}
+
+static gboolean close_window(GtkWidget *widget, GdkEvent *event, gpointer data) {
+    gtk_main_quit();
+    return FALSE;
 }
